@@ -60,7 +60,7 @@ export default function Incomes({ onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Deseja realmente excluir este ganho? Os valores distribuídos para as despesas serão estornados.')) return;
+    if (!window.confirm('Deseja realmente excluir este ganho? Os valores distribuídos para as despesas serão estornados.')) return;
     try {
       await api.deleteIncome(id);
       await fetchIncomes();

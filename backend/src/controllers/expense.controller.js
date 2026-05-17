@@ -45,3 +45,13 @@ export const remove = async (req, res, next) => {
     next(error);
   }
 };
+
+export const pay = async (req, res, next) => {
+  try {
+    const { accountId } = req.body;
+    const result = await expenseService.payExpense(req.params.id, accountId);
+    return sendSuccess(res, result, 'Despesa paga e ciclo resetado com sucesso');
+  } catch (error) {
+    next(error);
+  }
+};

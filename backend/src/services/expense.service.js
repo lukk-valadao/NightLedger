@@ -53,3 +53,51 @@ export const deleteExpense = async (id) => {
     where: { id }
   });
 };
+
+export const payExpense = async (id, accountId) => {
+  // Verify existence
+  const expense = await getExpenseById(id);
+
+  return await prisma.$transaction(async (tx) => {
+    // 1. Get allocations for the current active cycle to calculate covered balance
+    const activeAllocations = await tx.allocation.findMany({
+      where: {
+        expenseId: id,
+        cycleVersion: expense.cycleVersion
+      }
+    });
+
+    const amountCovered = activeAllocations.reduce((sum, alloc) => sum + alloc.amountAllocated, 0);
+
+    // 2. Increment cycle version on the expense
+    const updatedExpense = await tx.expense.update({
+      where: { id },
+      data: {
+        cycleVersion: {
+          increment: 1
+        }
+      }
+    });
+
+    // 3. Deduct from account balance if accountId is provided
+    if (accountId) {
+      const account = await tx.account.findUnique({
+        where: { id: accountId }
+      });
+      if (!account) {
+        throw new NotFoundError(`Conta bancária com ID ${accountId} não encontrada.`);
+      }
+
+      await tx.account.update({
+        where: { id: accountId },
+        data: {
+          balance: {
+            decrement: amountCovered
+          }
+        }
+      });
+    }
+
+    return updatedExpense;
+  });
+};

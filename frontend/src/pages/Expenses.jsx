@@ -98,7 +98,7 @@ export default function Expenses({ onRefresh }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Deseja realmente excluir esta despesa? Os lançamentos vinculados a ela serão deletados e as proporções recalculadas.')) return;
+    if (!window.confirm('Deseja realmente excluir esta despesa? Os lançamentos vinculados a ela serão deletados e as proporções recalculadas.')) return;
     try {
       await api.deleteExpense(id);
       await fetchExpenses();

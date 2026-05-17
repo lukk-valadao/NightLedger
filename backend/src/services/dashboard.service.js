@@ -29,8 +29,8 @@ export const getMonthlyDashboardData = async (month, year) => {
     }
   });
 
-  // 3. Fetch all allocations in this month
-  const allocations = await prisma.allocation.findMany({
+  // 3. Fetch all allocations in this month (for monthly faturamento analysis)
+  const monthlyAllocations = await prisma.allocation.findMany({
     where: {
       income: {
         date: {
@@ -41,21 +41,32 @@ export const getMonthlyDashboardData = async (month, year) => {
     }
   });
 
-  // 4. Calculate total expense target
-  const totalExpensesNeeded = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-
-  // 5. Group allocations by expense
-  const allocationsByExpense = {};
-  allocations.forEach((alloc) => {
-    if (!allocationsByExpense[alloc.expenseId]) {
-      allocationsByExpense[alloc.expenseId] = 0;
+  // 4. Fetch all allocations in the current active cycles of all expenses
+  const activeCycleAllocations = await prisma.allocation.findMany({
+    where: {
+      OR: expenses.map((exp) => ({
+        expenseId: exp.id,
+        cycleVersion: exp.cycleVersion
+      }))
     }
-    allocationsByExpense[alloc.expenseId] += alloc.amountAllocated;
   });
 
-  // 6. Map each expense with its coverage stats for the month
+  // 5. Fetch all bank accounts to calculate asset balances
+  const accounts = await prisma.account.findMany();
+  const totalBankBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+
+  // 6. Group active cycle allocations by expense
+  const activeAllocationsByExpense = {};
+  activeCycleAllocations.forEach((alloc) => {
+    if (!activeAllocationsByExpense[alloc.expenseId]) {
+      activeAllocationsByExpense[alloc.expenseId] = 0;
+    }
+    activeAllocationsByExpense[alloc.expenseId] += alloc.amountAllocated;
+  });
+
+  // 7. Map each expense with its active cycle coverage status
   const expensesReport = expenses.map((expense) => {
-    const amountCovered = allocationsByExpense[expense.id] || 0;
+    const amountCovered = activeAllocationsByExpense[expense.id] || 0;
     const amountRemaining = Math.max(0, expense.amount - amountCovered);
     const percentageCovered = expense.amount > 0 ? (amountCovered / expense.amount) * 100 : 0;
 
@@ -67,25 +78,35 @@ export const getMonthlyDashboardData = async (month, year) => {
       amountCovered,
       amountRemaining,
       percentageCovered,
-      isCovered: amountCovered >= expense.amount
+      isCovered: amountCovered >= expense.amount,
+      cycleVersion: expense.cycleVersion
     };
   });
 
-  // 7. Calculate overall financial totals
+  // 8. Calculate total expense targets and overall totals
+  const totalExpensesNeeded = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const totalGained = incomes.reduce((sum, inc) => sum + inc.amount, 0);
-  const totalCovered = allocations.reduce((sum, alloc) => sum + alloc.amountAllocated, 0);
-  const totalRemaining = Math.max(0, totalExpensesNeeded - totalCovered);
-  const overallPercentageCovered = totalExpensesNeeded > 0 ? (totalCovered / totalExpensesNeeded) * 100 : 0;
+  
+  // Total Reserved is the sum of cash currently allocated to unpaid/active cycles
+  const totalReserved = activeCycleAllocations.reduce((sum, alloc) => sum + alloc.amountAllocated, 0);
+  
+  // Free balance is bank assets minus reserved cash
+  const freeBalance = totalBankBalance - totalReserved;
+
+  const overallPercentageCovered = totalExpensesNeeded > 0 ? (totalReserved / totalExpensesNeeded) * 100 : 0;
 
   return {
     month: currentMonth,
     year: currentYear,
     totalExpensesNeeded,
-    totalGained,
-    totalCovered,
-    totalRemaining,
-    overallPercentageCovered,
+    totalGained, // monthly gross income
+    totalReserved, // cash committed to active bills
+    totalCovered: totalReserved, // backward compatibility
+    totalRemaining: Math.max(0, totalExpensesNeeded - totalReserved), // backward compatibility
+    overallPercentageCovered, // backward compatibility
+    totalBankBalance, // liquid assets
+    freeBalance, // discretionary cash
     expenses: expensesReport,
-    recentIncomes: incomes.slice(0, 5) // Send top 5 recent incomes for quick dashboard display
+    recentIncomes: incomes.slice(0, 5)
   };
 };

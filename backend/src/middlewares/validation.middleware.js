@@ -58,3 +58,28 @@ export const validateIncome = (req, res, next) => {
 
   next();
 };
+
+export const validateAccount = (req, res, next) => {
+  const { name, balance } = req.body;
+
+  const errors = [];
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    errors.push({ field: 'name', message: 'Name is required and must be a non-empty string' });
+  }
+  if (balance !== undefined && balance !== null && typeof balance !== 'number') {
+    errors.push({ field: 'balance', message: 'Balance must be a number' });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Validation failed',
+        status: 400,
+        details: errors
+      }
+    });
+  }
+
+  next();
+};

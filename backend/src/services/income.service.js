@@ -22,21 +22,13 @@ export const createIncome = async (data) => {
 
     // 3. Proportional distribution with Dynamic Overflow
     if (expenses.length > 0 && totalExpensesTarget > 0) {
-      // Calculate selected month & year start/end to aggregate current coverage
-      const currentMonth = parsedDate.getMonth() + 1;
-      const currentYear = parsedDate.getFullYear();
-      const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
-      const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
-
-      // Fetch all allocations registered in this same month/year prior to this new income
+      // Fetch all allocations registered for the active cycles of all current expenses
       const currentAllocations = await tx.allocation.findMany({
         where: {
-          income: {
-            date: {
-              gte: startOfMonth,
-              lte: endOfMonth
-            }
-          }
+          OR: expenses.map((exp) => ({
+            expenseId: exp.id,
+            cycleVersion: exp.cycleVersion
+          }))
         }
       });
 
@@ -129,7 +121,8 @@ export const createIncome = async (data) => {
           incomeId: income.id,
           expenseId: expense.id,
           amountAllocated,
-          percentage
+          percentage,
+          cycleVersion: expense.cycleVersion
         };
       });
 

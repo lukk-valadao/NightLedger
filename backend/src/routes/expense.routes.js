@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/', validateExpense, expenseController.create);
 router.get('/', expenseController.getAll);
+router.post('/:id/pay', expenseController.pay);
 router.get('/:id', expenseController.getById);
 router.put('/:id', validateExpense, expenseController.update);
 router.delete('/:id', expenseController.remove);

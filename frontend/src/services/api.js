@@ -50,6 +50,10 @@ export const api = {
   deleteExpense: (id) => request(`/expenses/${id}`, {
     method: 'DELETE',
   }),
+  payExpense: (id, accountId) => request(`/expenses/${id}/pay`, {
+    method: 'POST',
+    body: JSON.stringify({ accountId }),
+  }),
 
   // Incomes CRUD
   getIncomes: () => request('/incomes'),
@@ -58,6 +62,20 @@ export const api = {
     body: JSON.stringify(data),
   }),
   deleteIncome: (id) => request(`/incomes/${id}`, {
+    method: 'DELETE',
+  }),
+
+  // Accounts CRUD
+  getAccounts: () => request('/accounts'),
+  createAccount: (data) => request('/accounts', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateAccount: (id, data) => request(`/accounts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteAccount: (id) => request(`/accounts/${id}`, {
     method: 'DELETE',
   }),
 };
