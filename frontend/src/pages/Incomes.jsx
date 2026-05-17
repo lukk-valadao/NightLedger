@@ -6,7 +6,14 @@ export default function Incomes({ onRefresh }) {
   const [incomes, setIncomes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Helper to format local date as YYYY-MM-DD
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const [date, setDate] = useState(getLocalDateString());
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
@@ -33,14 +40,16 @@ export default function Incomes({ onRefresh }) {
 
     setSubmitting(true);
     try {
+      // Send date as local noon to fully prevent timezone shifting bugs
+      const localNoonDate = new Date(`${date}T12:00:00`);
       await api.createIncome({
         amount: parseFloat(amount),
-        date: new Date(date).toISOString(),
+        date: localNoonDate.toISOString(),
         notes: notes.trim() || null
       });
       setAmount('');
       setNotes('');
-      setDate(new Date().toISOString().split('T')[0]);
+      setDate(getLocalDateString());
       await fetchIncomes();
       onRefresh();
     } catch (error) {
