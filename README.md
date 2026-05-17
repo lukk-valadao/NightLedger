@@ -1,5 +1,12 @@
 # 🌌 NightLedger
 
+<p align="center">
+  <img src="https://img.shields.io/github/license/lukk-valadao/NightLedger?color=8B5CF6&style=for-the-badge" alt="GitHub license" />
+  <img src="https://img.shields.io/github/stars/lukk-valadao/NightLedger?color=F59E0B&style=for-the-badge" alt="GitHub stars" />
+  <img src="https://img.shields.io/github/forks/lukk-valadao/NightLedger?color=10B981&style=for-the-badge" alt="GitHub forks" />
+  <img src="https://img.shields.io/github/issues/lukk-valadao/NightLedger?color=EF4444&style=for-the-badge" alt="GitHub issues" />
+</p>
+
 > **Aplicativo web mobile-first de controle financeiro pessoal com rateio automático e proporcional de ganhos variáveis para profissionais autônomos.**
 
 O **NightLedger** foi desenhado especificamente para substituir planilhas financeiras complexas de trabalhadores autônomos e freelancers (como motoristas de aplicativo, designers, desenvolvedores e profissionais com renda variável diária). Ele funciona como um **PWA (Progressive Web App)**, permitindo ser instalado no celular e utilizado de forma rápida, simples e offline-ready.
@@ -213,3 +220,15 @@ Como o servidor do Vite foi configurado com a flag `host: true`, você pode aces
    * **iOS (Safari):** Toque no botão de **"Compartilhar"** (ícone de quadrado com seta para cima) e selecione **"Adicionar à Tela de Início"**.
 
 Agora você tem o **NightLedger** instalado na sua gaveta de aplicativos do celular, pronto para uso rápido no dia a dia! 🌌📈
+
+---
+
+## 👥 Autor
+
+* **Lukk Valadão** - *Idealizador e Desenvolvedor principal* - [@lukk-valadao](https://github.com/lukk-valadao)
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT - consulte o arquivo [LICENSE](file:///c:/Projetos/NightLedger/LICENSE) para obter mais detalhes.
