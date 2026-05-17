@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" rx="110" fill="#0F1322"/>
+  <!-- Ledger lines indicating proportional shares -->
+  <rect x="120" y="150" width="272" height="44" rx="12" fill="#3B82F6"/>
+  <rect x="120" y="234" width="180" height="44" rx="12" fill="#8B5CF6"/>
+  <rect x="120" y="318" width="230" height="44" rx="12" fill="#10B981"/>
+  <!-- Proportional dots indicating distribution points -->
+  <circle cx="420" cy="172" r="16" fill="#3B82F6" opacity="0.9"/>
+  <circle cx="330" cy="256" r="16" fill="#8B5CF6" opacity="0.9"/>
+  <circle cx="380" cy="340" r="16" fill="#10B981" opacity="0.9"/>
+</svg>

@@ -1,0 +1,44 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Expense {
+  id        String   @id @default(uuid())
+  name      String
+  amount    Float
+  category  String
+  createdAt DateTime @default(now()) @map("created_at")
+  allocations Allocation[]
+
+  @@map("expenses")
+}
+
+model Income {
+  id        String   @id @default(uuid())
+  amount    Float
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  allocations Allocation[]
+
+  @@map("incomes")
+}
+
+model Allocation {
+  id              String   @id @default(uuid())
+  incomeId        String   @map("income_id")
+  expenseId       String   @map("expense_id")
+  amountAllocated Float    @map("amount_allocated")
+  percentage      Float
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  income  Income  @relation(fields: [incomeId], references: [id], onDelete: Cascade)
+  expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@map("allocations")
+}
