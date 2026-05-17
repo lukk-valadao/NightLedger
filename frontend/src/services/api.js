@@ -50,9 +50,9 @@ export const api = {
   deleteExpense: (id) => request(`/expenses/${id}`, {
     method: 'DELETE',
   }),
-  payExpense: (id, accountId) => request(`/expenses/${id}/pay`, {
+  payExpense: (id, accountId, customAmount) => request(`/expenses/${id}/pay`, {
     method: 'POST',
-    body: JSON.stringify({ accountId }),
+    body: JSON.stringify({ accountId, customAmount }),
   }),
 
   // Incomes CRUD

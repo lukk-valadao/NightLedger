@@ -54,7 +54,7 @@ export const deleteExpense = async (id) => {
   });
 };
 
-export const payExpense = async (id, accountId) => {
+export const payExpense = async (id, accountId, customAmount) => {
   // Verify existence
   const expense = await getExpenseById(id);
 
@@ -88,11 +88,15 @@ export const payExpense = async (id, accountId) => {
         throw new NotFoundError(`Conta bancária com ID ${accountId} não encontrada.`);
       }
 
+      const amountToDeduct = (customAmount !== undefined && customAmount !== null)
+        ? parseFloat(customAmount)
+        : amountCovered;
+
       await tx.account.update({
         where: { id: accountId },
         data: {
           balance: {
-            decrement: amountCovered
+            decrement: amountToDeduct
           }
         }
       });

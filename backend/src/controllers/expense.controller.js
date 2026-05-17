@@ -48,8 +48,8 @@ export const remove = async (req, res, next) => {
 
 export const pay = async (req, res, next) => {
   try {
-    const { accountId } = req.body;
-    const result = await expenseService.payExpense(req.params.id, accountId);
+    const { accountId, customAmount } = req.body;
+    const result = await expenseService.payExpense(req.params.id, accountId, customAmount);
     return sendSuccess(res, result, 'Despesa paga e ciclo resetado com sucesso');
   } catch (error) {
     next(error);

@@ -114,8 +114,8 @@ export default function Dashboard({ data, onRefresh, onQuickIncome }) {
     }
   };
 
-  const handlePayExpense = async (expenseId, accountId) => {
-    await api.payExpense(expenseId, accountId);
+  const handlePayExpense = async (expenseId, accountId, customAmount) => {
+    await api.payExpense(expenseId, accountId, customAmount);
     await loadAccounts(); // refresh bank balances
     onRefresh(); // refresh dashboard totals
   };

@@ -6,6 +6,7 @@ export default function ExpenseProgressCard({ expense, accounts = [], onPayExpen
 
   const [showPayModal, setShowPayModal] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState('');
+  const [customPayAmount, setCustomPayAmount] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const percentage = Math.min(100, Math.max(0, percentageCovered));
@@ -47,7 +48,8 @@ export default function ExpenseProgressCard({ expense, accounts = [], onPayExpen
     e.preventDefault();
     setSubmitting(true);
     try {
-      await onPayExpense(id, selectedAccountId || null);
+      const amt = customPayAmount !== '' ? parseFloat(customPayAmount) : amountCovered;
+      await onPayExpense(id, selectedAccountId || null, amt);
       setShowPayModal(false);
       setSelectedAccountId('');
     } catch (error) {
@@ -110,7 +112,10 @@ export default function ExpenseProgressCard({ expense, accounts = [], onPayExpen
 
         {/* Pay & Reset Cycle Trigger (Option 3) - Always visible for active control */}
         <button
-          onClick={() => setShowPayModal(true)}
+          onClick={() => {
+            setCustomPayAmount(amountCovered.toString());
+            setShowPayModal(true);
+          }}
           className="mt-3.5 w-full py-2 bg-brand-success/10 border border-brand-success/30 hover:bg-brand-success/20 rounded-xl text-[10px] font-bold text-brand-success flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -134,11 +139,28 @@ export default function ExpenseProgressCard({ expense, accounts = [], onPayExpen
               </button>
             </div>
 
-            <div className="bg-dark-input rounded-2xl p-4 border border-dark-border/40 text-center space-y-1.5">
+            <div className="bg-dark-input rounded-2xl p-4 border border-dark-border/40 text-center space-y-2">
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Conta: {name}</p>
-              <h4 className="text-xl font-black text-brand-success leading-none">{formattedCovered}</h4>
+              
+              <div className="space-y-1">
+                <label className="text-[8px] text-slate-500 font-extrabold uppercase tracking-wider block">
+                  Valor a ser Debitado/Resetado
+                </label>
+                <div className="relative w-40 mx-auto">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-success font-black text-sm">R$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={customPayAmount}
+                    onChange={(e) => setCustomPayAmount(e.target.value)}
+                    required
+                    className="w-full bg-dark-bg border border-dark-border rounded-xl pl-8 pr-3 py-1 text-center text-sm font-black text-brand-success focus:outline-none focus:border-brand-success/50"
+                  />
+                </div>
+              </div>
+
               <p className="text-[9px] text-slate-500 font-semibold leading-normal">
-                Esse valor será baixado e o progresso voltará a zero para receber novos rateios.
+                Esse valor será debitado da conta escolhida e o progresso voltará a zero para novos rateios.
               </p>
             </div>
 
